@@ -59,7 +59,7 @@ class Timers {
     }
 
     _generateTimer(){
-        return new this._Timer({time:this._state.currentTimer, Button: this._Button}).element;
+        return new this._Timer({time:this._state.currentTimer * 1000, Button: this._Button}).element;
     }
 
     _setTimerHandler(){
@@ -165,7 +165,7 @@ class Timer {
             this._subElements.control.append(this._generatePauseBtn());
             this._isButtonAdded = true;
         }
-        this._subElements.time.textContent = this._state.time;
+        this._subElements.time.textContent = this._state.time/1000;
     }
 
     _removeTimerHandler(){
@@ -182,7 +182,7 @@ class Timer {
 
     _getTemplate() {
         return `<div class="timer">
-                    <span class="timer__time" data-element="time">${this._state.time}</span>
+                    <span class="timer__time" data-element="time">${this._state.time/1000}</span>
                     <div class="timer__control" data-element="control"></div>
                 </div>`;
       }

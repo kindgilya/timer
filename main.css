@@ -70,12 +70,24 @@
     margin: 5px 5px;
 }
 
-
+.timer__control{
+    width: 160px;
+    display: flex;
+    justify-content: space-between;
+}
 .btn--remove{
-    background-color: #071603;
+    background-color: #350808;
 }
 
 .btn--remove:hover{
+    background-color: #5f120f;
+}
+
+.btn--pause{
+    background-color: #071603;
+}
+
+.btn--pause:hover{
     background-color: #103307;
 }
 

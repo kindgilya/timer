@@ -11,8 +11,7 @@ class Timers {
     _subElements = null;
 
     _state = {
-        currentTimer: 0,
-        activeTimer: false
+        currentTimer: 0
     }
 
     constructor({Timer,Button}) {
@@ -23,10 +22,6 @@ class Timers {
 
     _setStateCurrentTimer(time){
         this._state.currentTimer = time;
-    }
-
-    _setStateActiveTimer(){
-        this._state.activeTimer = !this._state.activeTimer;
     }
 
     _init() {
@@ -52,24 +47,22 @@ class Timers {
             this._subElements.control.append(this._generateBtn());
             this._isButtonAdded = true;
         }
-        if (this._state.activeTimer) {
-            if (this._state.currentTimer <= 0) {
-                return;
-            }
-         this._subElements.control.append(this._generateTimer());
-         this._setStateCurrentTimer(0);
+        if (this._state.currentTimer > 0) {
+            this._subElements.control.append(this._generateTimer());
+            this._setStateCurrentTimer(0);
+            this._subElements.input.value = '';
         }
     }
 
     _generateBtn(){
         return new this._Button({use:"add", text:"Добавить таймер"}, this._setTimerHandler.bind(this)).element; 
     }
+
     _generateTimer(){
         return new this._Timer({time:this._state.currentTimer, Button: this._Button}).element;
     }
 
     _setTimerHandler(){
-        this._setStateActiveTimer();
         this._render();
     }
 
@@ -99,34 +92,97 @@ class Timers {
 class Timer {
     _element = null;
     _subElements = null;
+    _timerId;
+    _intervalId;
+
+    _state = {
+        time: 0,
+        isPaused: false
+    }
 
     constructor({time, Button}) {
-        this._time = time;
         this._Button = Button;
+        this._setStateTime(time);
         this._init();
+    }
+
+    _setStateTime(time){
+        this._state.time = time;
+    }
+
+    _setStateIsPaused(){
+        this._state.isPaused = !this._state.isPaused;
     }
 
     _init() {
         this._element = createElement(this._getTemplate());
         this._subElements = this._getSubElements();
+        this._createTimer();
         this._render();
+        this._startCountdown();
       }
 
-    _generateBtn(){
+    _createTimer() {
+        this._timerId = setTimeout(() => {
+          this._destroy();
+        }, this._state.time);
+      }
+
+    _startCountdown() {
+        this._intervalId = setInterval(() => {
+            if (!this._state.isPaused) {
+             this._setStateTime(this._state.time -= 1000);
+                if (this._state.time <= 0) {
+                    this._destroy();
+                }
+                this._render();
+            }
+        }, 1000);
+    }
+
+      _remove() {
+        this._element.remove();
+      }
+    
+      _destroy() {
+        this._remove();
+        clearInterval(this._intervalId);
+        clearTimeout(this._timerId);
+        this._element = null;
+      }
+
+    _generateRemoveBtn(){
         return new this._Button({use:"remove", text:"удалить"}, this._removeTimerHandler.bind(this)).element; 
     }
 
+    _generatePauseBtn(){
+        return new this._Button({use:"pause", text:"пауза"}, this._pauseTimerHandler.bind(this)).element; 
+    }
+
     _render(){
-        this._subElements.control.append(this._generateBtn());
+        if (!this._isButtonAdded) {
+            this._subElements.control.append(this._generateRemoveBtn());
+            this._subElements.control.append(this._generatePauseBtn());
+            this._isButtonAdded = true;
+        }
+        this._subElements.time.textContent = this._state.time;
     }
 
     _removeTimerHandler(){
-        console.log("hello");
+        this._destroy();
+    }
+
+    _pauseTimerHandler(){
+        this._setStateIsPaused();
+        if (!this._state.isPaused) {
+            clearTimeout(this._timerId);
+            this._createTimer();  
+        }
     }
 
     _getTemplate() {
         return `<div class="timer">
-                    <span class="timer__time">${this._time}</span>
+                    <span class="timer__time" data-element="time">${this._state.time}</span>
                     <div class="timer__control" data-element="control"></div>
                 </div>`;
       }

@@ -10,27 +10,75 @@ class Timers {
     _element = null;
     _subElements = null;
 
-    constructor() {
+    _state = {
+        currentTimer: 0,
+        activeTimer: false
+    }
+
+    constructor({Timer,Button}) {
+        this._Button = Button;
+        this._Timer = Timer;
         this._init();
+    }
+
+    _setStateCurrentTimer(time){
+        this._state.currentTimer = time;
+    }
+
+    _setStateActiveTimer(){
+        this._state.activeTimer = !this._state.activeTimer;
     }
 
     _init() {
         this._element = createElement(this._getTemplate());
         this._subElements = this._getSubElements();
-        // this._addListeners();
+        this._render();
+        this._addListeners();
       }
     
-    //   _addListeners() {
-       
-    //   }
+      _addListeners() {
+        this._subElements.input.addEventListener("input", (event) => {
+            if (event.target.value < 0 || event.target.value === "") {
+                this._setStateCurrentTimer(0);
+                return;
+            }
+            this._setStateCurrentTimer(event.target.value);
+          });
+      }
+
+    _render(){
+
+        if (!this._isButtonAdded) {
+            this._subElements.control.append(this._generateBtn());
+            this._isButtonAdded = true;
+        }
+        if (this._state.activeTimer) {
+            if (this._state.currentTimer <= 0) {
+                return;
+            }
+         this._subElements.control.append(this._generateTimer());
+         this._setStateCurrentTimer(0);
+        }
+    }
+
+    _generateBtn(){
+        return new this._Button({use:"add", text:"Добавить таймер"}, this._setTimerHandler.bind(this)).element; 
+    }
+    _generateTimer(){
+        return new this._Timer({time:this._state.currentTimer, Button: this._Button}).element;
+    }
+
+    _setTimerHandler(){
+        this._setStateActiveTimer();
+        this._render();
+    }
 
     _getTemplate() {
         return `<div class="timers">
             <div class="timers__control" data-element="control">
-                <input type="number" class="timers__input" data-element="input" placeholder="Введите время в секундах">
-                <button class="btn btn--add">Добавить таймер</button>
+                <input type="number" min="0" class="timers__input" data-element="input" placeholder="Введите время в секундах">
             </div>
-            <div class="timers__wrapper" data-element="timers" ></div>
+            <div class="timers__wrapper" data-element="timers"></div>
         </div>`;
       }
 
@@ -50,20 +98,46 @@ class Timers {
 
 class Timer {
     _element = null;
+    _subElements = null;
 
-    constructor() {
+    constructor({time, Button}) {
+        this._time = time;
+        this._Button = Button;
         this._init();
     }
 
     _init() {
         this._element = createElement(this._getTemplate());
+        this._subElements = this._getSubElements();
+        this._render();
       }
+
+    _generateBtn(){
+        return new this._Button({use:"remove", text:"удалить"}, this._removeTimerHandler.bind(this)).element; 
+    }
+
+    _render(){
+        this._subElements.control.append(this._generateBtn());
+    }
+
+    _removeTimerHandler(){
+        console.log("hello");
+    }
 
     _getTemplate() {
         return `<div class="timer">
-                    <span class="timer__time">10</span>
-                    <button class="btn btn--remove">удалить</button>
+                    <span class="timer__time">${this._time}</span>
+                    <div class="timer__control" data-element="control"></div>
                 </div>`;
+      }
+
+      _getSubElements() {
+        return Array.from(this._element.querySelectorAll("[data-element]")).reduce((acc, elem) => {
+          return {
+            ...acc,
+            [elem.getAttribute("data-element")]: elem,
+          };
+        }, {});
       }
 
       get element() {
@@ -101,4 +175,4 @@ class Button {
 }
 
 
-root.insertAdjacentElement("beforeend", new Timers().element);
+root.insertAdjacentElement("beforeend", new Timers({Timer,Button}).element);

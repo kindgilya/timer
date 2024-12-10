@@ -6,12 +6,82 @@
     margin-top: 20px;
 }
 
+.timers__input{
+    text-align: center;
+    color: #ff640a;
+}
+
+.timers__input::placeholder {
+    color: #e68851; 
+}
+
+.timers__input::-webkit-outer-spin-button,
+.timers__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .timers__control{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 20px 20px;
-    background-color: #e7d6f7;
+    background-color: #ffca84;
     border-radius: 10px;
+}
+
+.timers__input{
+    margin-bottom: 10px;
+}
+
+.btn{
+    padding: 10px 15px;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.btn--add{
+    background-color: #e79f03;
+    transition: 0.7s;
+}
+
+.btn--add:hover{
+    background-color: #ff8b06;
+}
+
+.timers__wrapper{
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding: 0 20px;
+}
+
+.timer{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 25px 25px;
+    background-color: #0f9738;
+    border-radius: 10px;
+    margin: 5px 5px;
+}
+
+
+.btn--remove{
+    background-color: #071603;
+}
+
+.btn--remove:hover{
+    background-color: #103307;
+}
+
+.timer__time{
+    margin-bottom: 15px;
+    font-size: 25px;
+    font-weight: 700;
+    cursor: default;
 }
